@@ -1,26 +1,111 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ─── Design Tokens (Tailwind v4 @theme) ─────────────────────────── */
+@theme {
+  /* Fonts */
+  --font-display: var(--font-cormorant), "Georgia", serif;
+  --font-sans: var(--font-jost), "Helvetica Neue", sans-serif;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Ink palette */
+  --color-ink: #0A0908;
+  --color-ink-800: #141210;
+  --color-ink-700: #1C1A17;
+  --color-ink-600: #2A2622;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Gold palette */
+  --color-gold: #C9A961;
+  --color-gold-200: #E8D5A8;
+  --color-gold-400: #D1B373;
+  --color-gold-700: #7E6834;
+
+  /* Cream palette */
+  --color-cream: #F5F1E8;
+  --color-cream-200: #EDE6D2;
+
+  /* Tracking utilities */
+  --tracking-ultra: 0.4em;
+  --tracking-tight: -0.02em;
+
+  /* Keyframes */
+  @keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -10%); }
+    20% { transform: translate(-15%, 5%); }
+    30% { transform: translate(7%, -25%); }
+    40% { transform: translate(-5%, 25%); }
+    50% { transform: translate(-15%, 10%); }
+    60% { transform: translate(15%, 0%); }
+    70% { transform: translate(0%, 15%); }
+    80% { transform: translate(3%, 35%); }
+    90% { transform: translate(-10%, 10%); }
   }
 }
 
+/* ─── Base styles ─────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ─── Selection ───────────────────────────────────────────────────── */
+::selection {
+  background-color: var(--color-gold);
+  color: var(--color-ink);
+}
+
+/* ─── Custom scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink-800);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold-700);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
+/* ─── Grain texture overlay ──────────────────────────────────────── */
+.grain-overlay::after {
+  content: "";
+  position: absolute;
+  inset: -200%;
+  width: 400%;
+  height: 400%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  pointer-events: none;
+  animation: grain 8s steps(10) infinite;
+  opacity: 0.4;
+  z-index: 1;
+}
+
+/* ─── Gold hairline divider ──────────────────────────────────────── */
+.hairline-gold {
+  height: 1px;
+  background-color: var(--color-gold-700);
+  opacity: 0.6;
+  border: none;
+}
+
+/* ─── Focus ring ─────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
 }

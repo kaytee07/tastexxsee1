@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  ref           String   @unique
+  createdAt     DateTime @default(now())
+  status        String   @default("received") // received | preparing | ready | completed
+  customerName  String
+  phone         String
+  orderType     String   // delivery | pickup
+  address       String?
+  paymentMethod String   // cash | momo
+  momoProvider  String?
+  momoNumber    String?
+  notes         String?
+  lines         Json     // serialized ResolvedCartLine[]
+  total         Float
+}
+
+model CateringInquiry {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  fullName  String
+  phone     String
+  email     String
+  tier      String   // private-chef | custom-diet
+  eventDate DateTime
+  guests    Int
+  diets     Json?    // string[]
+  location  String
+  message   String?
+  status    String   @default("new") // new | contacted | closed
+}
