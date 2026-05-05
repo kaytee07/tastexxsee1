@@ -18,7 +18,7 @@ export default async function DashboardPage() {
       prisma.cateringInquiry.findMany({ orderBy: { createdAt: 'desc' } }),
     ]);
 
-    orders = rawOrders.map((o) => ({
+    orders = rawOrders.map((o: typeof rawOrders[number]) => ({
       id: o.id,
       ref: o.ref,
       createdAt: o.createdAt.toISOString(),
@@ -35,7 +35,7 @@ export default async function DashboardPage() {
       total: o.total,
     }));
 
-    inquiries = rawInquiries.map((i) => ({
+    inquiries = rawInquiries.map((i: typeof rawInquiries[number]) => ({
       id: i.id,
       createdAt: i.createdAt.toISOString(),
       fullName: i.fullName,
