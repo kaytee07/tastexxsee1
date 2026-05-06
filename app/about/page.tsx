@@ -4,9 +4,9 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Divider } from '@/components/ui/Divider';
 
 export const metadata: Metadata = {
-  title: 'About — TasteXXSee',
+  title: 'About — TastexxSee',
   description:
-    'The story behind TasteXXSee — Ghanaian comfort food meets Asian-influenced rice and noodles in one kitchen.',
+    'The story behind TastexxSee — Ghanaian comfort food meets Asian-influenced rice and noodles in one kitchen.',
 };
 
 const PILLARS = [
@@ -23,7 +23,7 @@ const PILLARS = [
   {
     eyebrow: 'YOUR TABLE, OUR KITCHEN',
     title: 'Catering',
-    body: 'When the restaurant isn\'t enough, we come to you. From intimate dinner parties to large private events, our boutique catering service brings the TasteXXSee kitchen to your home, your venue, your table. Two tiers: Private Chef Hire and Custom Diet Catering.', // TODO: replace with client copy
+    body: 'When the restaurant isn\'t enough, we come to you. From intimate dinner parties to large private events, our boutique catering service brings the TastexxSee kitchen to your home, your venue, your table. Two tiers: Private Chef Hire and Custom Diet Catering.', // TODO: replace with client copy
   },
 ];
 
@@ -69,7 +69,7 @@ export default function AboutPage() {
           <Divider short />
           <p className="font-sans text-lg text-cream-200 leading-relaxed mt-8">
             {/* TODO: replace with client copy */}
-            TasteXXSee opened with one intention: to feed people well. Not with
+            TastexxSee opened with one intention: to feed people well. Not with
             pretension, and not with compromise. The restaurant sits at the intersection
             of Ghanaian home cooking and the kind of Asian-influenced rice and noodle
             dishes that have quietly become a fixture on West African plates. We didn&apos;t
@@ -99,7 +99,7 @@ export default function AboutPage() {
             <div key={i} className="relative aspect-square overflow-hidden bg-ink-800">
               <Image
                 src={src}
-                alt="TasteXXSee food photography"
+                alt="TastexxSee food photography"
                 fill
                 className="object-cover transition-transform duration-700 hover:scale-105"
                 sizes="(max-width: 768px) 50vw, 33vw"

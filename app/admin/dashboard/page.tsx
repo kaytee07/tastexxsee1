@@ -4,7 +4,7 @@ import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import type { Order, CateringInquiry, ResolvedCartLine } from '@/types';
 
 export const metadata: Metadata = {
-  title: 'Dashboard — TasteXXSee Admin',
+  title: 'Dashboard — TastexxSee Admin',
   robots: 'noindex',
 };
 

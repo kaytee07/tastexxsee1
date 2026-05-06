@@ -4,7 +4,7 @@ import { PageWrapper } from '@/components/layout/PageWrapper';
 import { MenuTabs } from '@/components/menu/MenuTabs';
 
 export const metadata: Metadata = {
-  title: 'Menu — TasteXXSee',
+  title: 'Menu — TastexxSee',
   description: 'Explore our Ghanaian local plates and Asian-influenced rice and noodle dishes.',
 };
 
@@ -22,7 +22,7 @@ export default async function MenuPage({ searchParams }: MenuPageProps) {
         <PageWrapper className="py-16 md:py-20">
           <div className="flex flex-col gap-3">
             <span className="font-sans text-xs text-gold tracking-[0.4em] uppercase font-medium">
-              TasteXXSee
+              TastexxSee
             </span>
             <h1 className="font-display italic text-cream text-5xl md:text-7xl leading-none">
               Our Menu

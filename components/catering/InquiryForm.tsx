@@ -171,7 +171,7 @@ export function InquiryForm() {
           Inquiry Received
         </h3>
         <p className="font-sans text-cream-200 text-base max-w-md leading-relaxed">
-          We've received your inquiry. The TasteXXSee team will call you within 24 hours.
+          We've received your inquiry. The TastexxSee team will call you within 24 hours.
         </p>
       </motion.div>
     );

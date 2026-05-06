@@ -73,7 +73,7 @@ export function Header() {
         <div className="w-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-20 flex items-center justify-between">
           {/* Wordmark */}
           <a href="/" className="font-display italic text-cream text-2xl leading-none z-10">
-            TasteXXSee
+            TastexxSee
           </a>
 
           {/* Desktop nav — center */}

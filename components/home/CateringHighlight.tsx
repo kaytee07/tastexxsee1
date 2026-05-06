@@ -10,7 +10,7 @@ const TIERS = [
   {
     title: 'Private Chef Hire',
     description:
-      'A chef from TasteXXSee comes to your home or venue to prepare and serve the meal on-site. Everything from ingredients to plating is handled.',
+      'A chef from TastexxSee comes to your home or venue to prepare and serve the meal on-site. Everything from ingredients to plating is handled.',
     details: ['Chef + sous if needed', 'All cookware & ingredients', 'Full plating and service'],
     icon: '✦',
   },
@@ -26,6 +26,7 @@ const TIERS = [
 export function CateringHighlight() {
   return (
     <section
+      id="catering-highlight"
       className="py-24 md:py-32 px-6 md:px-12 lg:px-20 bg-ink-800"
       aria-labelledby="catering-heading"
     >

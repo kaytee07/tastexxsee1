@@ -7,7 +7,7 @@ import { Divider } from '@/components/ui/Divider';
 import type { ResolvedCartLine } from '@/types';
 
 export const metadata: Metadata = {
-  title: 'Order Confirmed — TasteXXSee',
+  title: 'Order Confirmed — TastexxSee',
   robots: 'noindex',
 };
 

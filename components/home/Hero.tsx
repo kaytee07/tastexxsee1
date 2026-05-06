@@ -102,8 +102,8 @@ export function Hero() {
           <Button variant="primary" href="/menu">
             Order Now
           </Button>
-          <Button variant="ghost" href="/catering">
-            Explore Catering
+          <Button variant="ghost" href="#catering-highlight">
+            Boutique Catering
           </Button>
         </motion.div>
       </div>

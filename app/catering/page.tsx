@@ -7,7 +7,7 @@ import { TrustBand } from '@/components/catering/TrustBand';
 import { InquirySection } from '@/components/catering/InquirySection';
 
 export const metadata: Metadata = {
-  title: 'Boutique Catering — TasteXXSee',
+  title: 'Boutique Catering — TastexxSee',
   description:
     'Private chef hire and custom diet catering in Ghana. Restaurant-quality, brought to your table.',
 };

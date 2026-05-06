@@ -4,9 +4,9 @@ import { Divider } from '@/components/ui/Divider';
 import { ContactForm } from '@/components/contact/ContactForm';
 
 export const metadata: Metadata = {
-  title: 'Contact — TasteXXSee',
+  title: 'Contact — TastexxSee',
   description:
-    'Find TasteXXSee in Ghana. Address, phone, opening hours, and a contact form.',
+    'Find TastexxSee in Ghana. Address, phone, opening hours, and a contact form.',
 };
 
 const HOURS = [
@@ -122,7 +122,7 @@ export default function ContactPage() {
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="TasteXXSee location map"
+                title="TastexxSee location map"
                 className="absolute inset-0"
               />
             </div>

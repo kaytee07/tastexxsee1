@@ -6,9 +6,9 @@ import { FounderTeaser } from '@/components/home/FounderTeaser';
 import { ClosingCta } from '@/components/home/ClosingCta';
 
 export const metadata: Metadata = {
-  title: 'TasteXXSee — Local roots, global plates · Ghana',
+  title: 'TastexxSee — Local roots, global plates · Ghana',
   description:
-    'TasteXXSee serves Ghanaian local plates alongside Asian-influenced rice and noodle dishes, and offers boutique catering for private events.',
+    'TastexxSee serves Ghanaian local plates alongside Asian-influenced rice and noodle dishes, and offers boutique catering for private events.',
 };
 
 export default function HomePage() {

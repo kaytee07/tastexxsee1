@@ -31,7 +31,7 @@ export function FounderTeaser() {
           >
             <Image
               src={FOUNDER_IMAGE}
-              alt="Richard Nana Yaw Oduro — head chef and founder of TasteXXSee"
+              alt="Richard Nana Yaw Oduro — head chef and founder of TastexxSee"
               fill
               className="object-cover object-top"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -73,7 +73,7 @@ export function FounderTeaser() {
             >
               Richard Nana Yaw Oduro read Economics and Mathematics at the University
               of Ghana before following a deeper calling into the kitchen. As head chef
-              of TasteXXSee, he brings the same rigour he applied to numbers to every
+              of TastexxSee, he brings the same rigour he applied to numbers to every
               dish he creates — rooted in Ghanaian tradition, open to the world.
             </motion.p>
 

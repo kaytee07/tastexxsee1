@@ -9,7 +9,7 @@ export function Footer() {
           {/* Column 1: Wordmark + tagline + address */}
           <div className="flex flex-col gap-4">
             <span className="font-display italic text-cream text-2xl leading-none">
-              TasteXXSee
+              TastexxSee
             </span>
             <p className="font-sans text-sm text-cream-200 leading-relaxed max-w-[240px]">
               Local roots. Global plates. Boutique catering for private events across Ghana.
@@ -61,7 +61,7 @@ export function Footer() {
               </li>
             </ul>
             <p className="font-sans text-xs text-cream-200/40 mt-auto pt-6 md:pt-0">
-              &copy; 2025 TasteXXSee. All rights reserved.
+              &copy; 2025 TastexxSee. All rights reserved.
             </p>
           </div>
         </div>

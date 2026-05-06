@@ -56,7 +56,7 @@ export function FounderHero() {
       >
         <Image
           src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&q=80"
-          alt="Richard Nana Yaw Oduro — Head Chef and Founder of TasteXXSee"
+          alt="Richard Nana Yaw Oduro — Head Chef and Founder of TastexxSee"
           fill
           priority
           className="object-cover object-top"

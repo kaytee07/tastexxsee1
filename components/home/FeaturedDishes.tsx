@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { SectionMarker } from '@/components/ui/SectionMarker';
 import { Divider } from '@/components/ui/Divider';
 import { Eyebrow } from '@/components/ui/Eyebrow';
+import { Button } from '@/components/ui/Button';
 import { fadeUp, stagger, viewportOnce } from '@/lib/motion';
 import { formatPriceForCard } from '@/lib/format';
 import { featuredItems } from '@/lib/menu-data';
@@ -119,6 +120,19 @@ export function FeaturedDishes() {
               </div>
             </motion.a>
           ))}
+        </motion.div>
+
+        {/* CTA to full menu */}
+        <motion.div
+          className="mt-12 flex justify-start"
+          variants={fadeUp}
+          initial="initial"
+          whileInView="animate"
+          viewport={viewportOnce}
+        >
+          <Button variant="ghost" href="/menu">
+            View full menu
+          </Button>
         </motion.div>
       </div>
     </section>

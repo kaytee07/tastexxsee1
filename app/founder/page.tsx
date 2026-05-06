@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/Button';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 
 export const metadata: Metadata = {
-  title: 'The Founder — TasteXXSee',
+  title: 'The Founder — TastexxSee',
   description:
-    'Meet the chef and founder of TasteXXSee. His story, his philosophy, his kitchen.',
+    'Meet the chef and founder of TastexxSee. His story, his philosophy, his kitchen.',
 };
 
 export default function FounderPage() {

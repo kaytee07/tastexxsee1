@@ -36,7 +36,7 @@ export function StoryArticle() {
 
         <PullQuote
           quote="I left the lecture hall, but I never stopped studying. The kitchen just became my classroom."
-          attribution="— Richard Nana Yaw Oduro, Head Chef & Founder, TasteXXSee"
+          attribution="— Richard Nana Yaw Oduro, Head Chef & Founder, TastexxSee"
         />
 
         <motion.p
@@ -60,7 +60,7 @@ export function StoryArticle() {
           viewport={viewportOnce}
           variants={fadeUp}
         >
-          TasteXXSee is the result of that conversation. As head chef, Richard oversees every
+          TastexxSee is the result of that conversation. As head chef, Richard oversees every
           dish that leaves the kitchen — not as a manager, but as a craftsman. The menu is
           not a compromise between two cuisines; it is a coherent vision from a single mind
           that refuses to be limited by borders. Whether you are eating his Thai Fried Rice

@@ -43,7 +43,7 @@ export function buildOrderSms(order: OrderSmsPayload): string {
  *
  * Required env vars:
  *   ARKESEL_API_KEY   — from arkesel.com dashboard
- *   ARKESEL_SENDER_ID — your registered sender name (e.g. "TasteXXSee"), max 11 chars
+ *   ARKESEL_SENDER_ID — your registered sender name (e.g. "TastexxSee"), max 11 chars
  *   ADMIN_PHONE       — phone number to receive alerts, Ghana format e.g. +233244123456
  *
  * Fire-and-forget — never throws so a failed SMS never blocks an order save.
@@ -51,7 +51,7 @@ export function buildOrderSms(order: OrderSmsPayload): string {
 export async function sendOrderSms(order: OrderSmsPayload): Promise<void> {
   const apiKey    = process.env.ARKESEL_API_KEY;
   const adminPhone = process.env.ADMIN_PHONE;
-  const senderId  = process.env.ARKESEL_SENDER_ID ?? 'TasteXXSee';
+  const senderId  = process.env.ARKESEL_SENDER_ID ?? 'TastexxSee';
 
   if (!apiKey || !adminPhone) {
     console.warn('[SMS] ARKESEL_API_KEY or ADMIN_PHONE not set — skipping SMS');
