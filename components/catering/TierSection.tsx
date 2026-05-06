@@ -35,7 +35,7 @@ export function TierSection() {
             >
               <div className="relative w-full" style={{ aspectRatio: '3/4' }}>
                 <Image
-                  src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=900&q=80"
+                  src="/img/chef.png"
                   alt="Chef preparing a private dining experience"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
