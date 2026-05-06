@@ -7,7 +7,7 @@ import { Divider } from '@/components/ui/Divider';
 import { Button } from '@/components/ui/Button';
 import { fadeUp, stagger, viewportOnce } from '@/lib/motion';
 
-const FOUNDER_IMAGE = '/img/nana.jpeg';
+const FOUNDER_IMAGE = '/img/nana1.png';
 
 export function FounderTeaser() {
   return (

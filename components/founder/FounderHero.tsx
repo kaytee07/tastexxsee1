@@ -55,7 +55,7 @@ export function FounderHero() {
         transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
       >
         <Image
-          src="/img/nana.jpeg"
+          src="/img/nana1.png"
           alt="Richard Nana Yaw Oduro — Head Chef and Founder of TastexxSee"
           fill
           priority
