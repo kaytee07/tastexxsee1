@@ -25,7 +25,7 @@ function StatCard({
   accent?: boolean;
 }) {
   return (
-    <div className="bg-ink-700 p-5 flex flex-col gap-1 border border-gold-700/20">
+    <div className="bg-ink-700 p-4 md:p-5 flex flex-col gap-1 border border-gold-700/20">
       <span
         className="font-sans text-xs uppercase text-gold-700"
         style={{ letterSpacing: '0.3em' }}
@@ -57,15 +57,15 @@ export function AdminDashboard({ orders, inquiries }: Props) {
   return (
     <div className="max-w-[1280px] mx-auto">
       {/* Page header */}
-      <div className="mb-10 pb-8 border-b border-gold-700/30">
-        <h1 className="font-display italic text-cream text-4xl leading-none">Dashboard</h1>
-        <p className="font-sans text-xs text-cream-200/50 mt-2 uppercase" style={{ letterSpacing: '0.3em' }}>
+      <div className="mb-8 pb-6 border-b border-gold-700/30">
+        <h1 className="font-display italic text-cream text-3xl md:text-4xl leading-none">Dashboard</h1>
+        <p className="font-sans text-xs text-cream-200/50 mt-2 uppercase hidden sm:block" style={{ letterSpacing: '0.3em' }}>
           TastexxSee Restaurant — Order Management
         </p>
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gold-700/10 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gold-700/10 mb-8">
         <StatCard label="Total Orders" value={orders.length} />
         <StatCard label="Active Orders" value={activeOrders} sub="not yet completed" accent />
         <StatCard label="Inquiries" value={inquiries.length} />

@@ -18,7 +18,7 @@ export function InquirySection() {
             className="font-display text-cream mt-3 leading-tight"
             style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
           >
-            Let&apos;s plan <em className="italic text-gold">your event.</em>
+            Book <em className="italic text-gold">your service.</em>
           </h2>
           <div className="mt-6">
             <Divider short />

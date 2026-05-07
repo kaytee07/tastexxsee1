@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Eyebrow } from '@/components/ui/Eyebrow';
@@ -57,9 +58,18 @@ const INITIAL_TOUCHED: TouchedState = {
   location: false,
 };
 
+const FIELD_LABELS: Record<string, string> = {
+  fullName: 'Full name',
+  phone: 'Phone number',
+  email: 'Email address',
+  tier: 'Service tier',
+  eventDate: 'Event date',
+  guests: 'Number of guests',
+  location: 'Event location',
+};
+
 function getErrors(form: FormState): Partial<Record<keyof FormState, string>> {
   const errors: Partial<Record<keyof FormState, string>> = {};
-
   if (!form.fullName.trim()) errors.fullName = 'Full name is required.';
   if (!form.phone.trim()) {
     errors.phone = 'Phone number is required.';
@@ -70,8 +80,7 @@ function getErrors(form: FormState): Partial<Record<keyof FormState, string>> {
   if (!form.tier) errors.tier = 'Please select a service tier.';
   if (!form.eventDate) errors.eventDate = 'Event date is required.';
   if (!form.guests || Number(form.guests) < 1) errors.guests = 'Enter at least 1 guest.';
-  if (!form.location.trim()) errors.location = 'Location is required.';
-
+  if (!form.location.trim()) errors.location = 'Event location is required.';
   return errors;
 }
 
@@ -86,10 +95,11 @@ export function InquiryForm() {
   });
 
   const [touched, setTouched] = useState<TouchedState>(INITIAL_TOUCHED);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState('');
 
-  // Sync tier if URL param changes (shallow nav)
   useEffect(() => {
     const tierParam = searchParams.get('tier');
     if (tierParam === 'private-chef' || tierParam === 'custom-diet') {
@@ -99,6 +109,9 @@ export function InquiryForm() {
 
   const errors = getErrors(form);
   const isValid = Object.keys(errors).length === 0;
+
+  // Error list for the summary banner — only fields the user hasn't filled
+  const errorEntries = Object.entries(errors) as [keyof FormState, string][];
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -119,22 +132,19 @@ export function InquiryForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
+    setSubmitAttempted(true);
     setTouched({
-      fullName: true,
-      phone: true,
-      email: true,
-      tier: true,
-      eventDate: true,
-      guests: true,
-      location: true,
+      fullName: true, phone: true, email: true, tier: true,
+      eventDate: true, guests: true, location: true,
     });
 
     if (!isValid) return;
 
     setLoading(true);
+    setServerError('');
+
     try {
-      await fetch('/api/catering', {
+      const res = await fetch('/api/catering', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -149,8 +159,15 @@ export function InquiryForm() {
           message: form.message.trim() || undefined,
         }),
       });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        setServerError(data.error ?? 'Something went wrong. Please try again.');
+        return;
+      }
     } catch {
-      // Network error — still show success, inquiry logged on next attempt
+      setServerError('Could not send your inquiry. Check your connection and try again.');
+      return;
     } finally {
       setLoading(false);
     }
@@ -167,9 +184,7 @@ export function InquiryForm() {
         className="py-16 text-center flex flex-col items-center gap-6"
       >
         <span className="font-display italic text-gold text-5xl leading-none">✦</span>
-        <h3 className="font-display text-cream text-2xl md:text-3xl">
-          Inquiry Received
-        </h3>
+        <h3 className="font-display text-cream text-2xl md:text-3xl">Inquiry Received</h3>
         <p className="font-sans text-cream-200 text-base max-w-md leading-relaxed">
           We've received your inquiry. The TastexxSee team will call you within 24 hours.
         </p>
@@ -261,16 +276,14 @@ export function InquiryForm() {
                     form.tier === value ? 'border-gold' : 'border-ink-600'
                   )}
                 >
-                  {form.tier === value && (
-                    <span className="w-2 h-2 bg-gold block" />
-                  )}
+                  {form.tier === value && <span className="w-2 h-2 bg-gold block" />}
                 </span>
                 {label}
               </button>
             ))}
           </div>
           {touched.tier && errors.tier && (
-            <p className="font-sans text-xs text-gold-200 mt-0.5" role="alert">
+            <p className="font-sans text-xs text-gold mt-0.5" role="alert">
               {errors.tier}
             </p>
           )}
@@ -358,15 +371,65 @@ export function InquiryForm() {
           />
         </motion.div>
 
+        {/* Server error */}
+        <AnimatePresence>
+          {serverError && (
+            <motion.div
+              key="server-error"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              role="alert"
+              aria-live="polite"
+              className="flex items-start gap-3 border border-gold/40 bg-gold/5 px-4 py-4"
+            >
+              <AlertCircle size={16} className="text-gold flex-shrink-0 mt-0.5" strokeWidth={1.5} />
+              <p className="font-sans text-sm text-cream-200">{serverError}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Validation error summary banner — appears after first submit attempt */}
+        <AnimatePresence>
+          {submitAttempted && !isValid && (
+            <motion.div
+              key="error-banner"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              role="alert"
+              aria-live="polite"
+              className="flex items-start gap-3 border border-gold/40 bg-gold/5 px-4 py-4"
+            >
+              <AlertCircle size={16} className="text-gold flex-shrink-0 mt-0.5" strokeWidth={1.5} />
+              <div>
+                <p className="font-sans text-sm text-gold font-medium">
+                  Please complete the following before sending:
+                </p>
+                <ul className="mt-2 flex flex-col gap-1">
+                  {errorEntries.map(([field, msg]) => (
+                    <li key={field} className="font-sans text-xs text-cream-200 flex items-start gap-2">
+                      <span className="text-gold mt-0.5 leading-none flex-shrink-0">—</span>
+                      {msg}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Submit */}
         <motion.div variants={fadeUp}>
-          <button
-            type="submit"
-            disabled={!isValid && Object.values(touched).some(Boolean)}
-            className="inline-flex items-center justify-center gap-2 font-sans text-sm font-medium tracking-wide uppercase cursor-pointer bg-gold text-ink h-[52px] px-8 transition-opacity duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 w-full sm:w-auto"
+          <Button
+            variant="primary"
+            onClick={() => {}}
+            disabled={loading}
           >
-            Send Inquiry
-          </button>
+            {loading ? 'Sending…' : 'Send Inquiry'}
+          </Button>
         </motion.div>
       </motion.form>
     </AnimatePresence>

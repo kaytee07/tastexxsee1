@@ -82,8 +82,8 @@ export default async function OrderConfirmationPage({ params }: Props) {
               </>
             )}
             <span className="text-cream-200">Payment</span>
-            <span className="text-cream capitalize">
-              {order.paymentMethod === 'momo' ? 'Mobile Money' : 'Cash on Delivery'}
+            <span className="text-cream">
+              {order.orderType === 'delivery' ? 'Cash on Delivery' : 'Cash on Pickup'}
             </span>
           </div>
         </div>

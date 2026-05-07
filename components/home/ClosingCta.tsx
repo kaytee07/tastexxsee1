@@ -58,7 +58,7 @@ export function ClosingCta() {
               Order Now
             </Button>
             <Button variant="secondary" href="/catering">
-              Plan an Event
+              Book Catering
             </Button>
           </motion.div>
         </motion.div>

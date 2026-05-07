@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { sendCateringSms } from '@/lib/sms';
 import { auth } from '@/lib/auth';
 import type { CateringTier, DietPreference } from '@/types';
 
@@ -36,6 +37,18 @@ export async function POST(req: NextRequest) {
         location,
         message: message ?? null,
       },
+    });
+
+    // Fire SMS to admin — non-blocking, never fails the inquiry save
+    sendCateringSms({
+      fullName,
+      phone,
+      tier,
+      eventDate,
+      guests,
+      location,
+      diets,
+      message,
     });
 
     return NextResponse.json({ id: inquiry.id }, { status: 201 });

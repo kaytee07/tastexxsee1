@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generateRef } from '@/lib/format';
-import { sendOrderSms } from '@/lib/sms';
+import { sendOrderSms, sendCustomerOrderSms } from '@/lib/sms';
 import { auth } from '@/lib/auth';
 import type { ResolvedCartLine, OrderType, PaymentMethod, MomoProvider } from '@/types';
 
@@ -51,18 +51,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Fire SMS to admin — non-blocking, never fails the order
-    sendOrderSms({
+    // Build the shared payload once, fire both SMSes in parallel — non-blocking
+    const smsPayload = {
       ref: order.ref,
       customerName: order.customerName,
       phone: order.phone,
       orderType: order.orderType as OrderType,
       address: order.address ?? undefined,
-      paymentMethod: order.paymentMethod as 'cash' | 'momo',
+      paymentMethod: 'cash' as const,
       lines,
       total: order.total,
       notes: order.notes ?? undefined,
-    });
+    };
+
+    sendOrderSms(smsPayload);         // → admin phone
+    sendCustomerOrderSms(smsPayload); // → customer phone
 
     return NextResponse.json({ ref: order.ref, id: order.id }, { status: 201 });
   } catch (err) {

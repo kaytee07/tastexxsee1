@@ -1,5 +1,5 @@
 import { formatGhs } from '@/lib/format';
-import type { ResolvedCartLine, OrderType } from '@/types';
+import type { ResolvedCartLine, OrderType, CateringTier, DietPreference } from '@/types';
 
 interface OrderSmsPayload {
   ref: string;
@@ -37,36 +37,60 @@ export function buildOrderSms(order: OrderSmsPayload): string {
   );
 }
 
-/**
- * Send an SMS via the Arkesel API v2.
- * https://developers.arkesel.com
- *
- * Required env vars:
- *   ARKESEL_API_KEY   — from arkesel.com dashboard
- *   ARKESEL_SENDER_ID — your registered sender name (e.g. "TastexxSee"), max 11 chars
- *   ADMIN_PHONE       — phone number to receive alerts, Ghana format e.g. +233244123456
- *
- * Fire-and-forget — never throws so a failed SMS never blocks an order save.
- */
-export async function sendOrderSms(order: OrderSmsPayload): Promise<void> {
-  const apiKey    = process.env.ARKESEL_API_KEY;
+// ─── Catering inquiry SMS ────────────────────────────────────────────────────
+
+interface CateringSmsPayload {
+  fullName: string;
+  phone: string;
+  tier: CateringTier;
+  eventDate: string;   // ISO date string
+  guests: number;
+  location: string;
+  diets?: DietPreference[];
+  message?: string;
+}
+
+const TIER_LABELS: Record<CateringTier, string> = {
+  'private-chef': 'Private Chef Hire',
+  'custom-diet': 'Custom Diet Catering',
+};
+
+export function buildCateringSms(inquiry: CateringSmsPayload): string {
+  const date = new Date(inquiry.eventDate).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric',
+  });
+  const dietsLine = inquiry.diets?.length
+    ? `\nDiets: ${inquiry.diets.join(', ')}`
+    : '';
+  const msgLine = inquiry.message ? `\nNote: ${inquiry.message}` : '';
+
+  return (
+    `NEW CATERING INQUIRY\n` +
+    `Client: ${inquiry.fullName} (${inquiry.phone})\n` +
+    `Tier: ${TIER_LABELS[inquiry.tier]}\n` +
+    `Event: ${date} | ${inquiry.guests} guests\n` +
+    `Location: ${inquiry.location}` +
+    dietsLine +
+    msgLine
+  );
+}
+
+export async function sendCateringSms(inquiry: CateringSmsPayload): Promise<void> {
+  const apiKey     = process.env.ARKESEL_API_KEY;
   const adminPhone = process.env.ADMIN_PHONE;
-  const senderId  = process.env.ARKESEL_SENDER_ID ?? 'TastexxSee';
+  const senderId   = process.env.ARKESEL_SENDER_ID ?? 'TastexxSee';
 
   if (!apiKey || !adminPhone) {
-    console.warn('[SMS] ARKESEL_API_KEY or ADMIN_PHONE not set — skipping SMS');
+    console.warn('[SMS] ARKESEL_API_KEY or ADMIN_PHONE not set — skipping catering SMS');
     return;
   }
 
-  const message = buildOrderSms(order);
+  const message = buildCateringSms(inquiry);
 
   try {
     const res = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
       method: 'POST',
-      headers: {
-        'api-key': apiKey,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         sender: senderId,
         message,
@@ -76,12 +100,110 @@ export async function sendOrderSms(order: OrderSmsPayload): Promise<void> {
     });
 
     if (res.status === 200) {
-      console.log('[SMS] Order notification sent for', order.ref);
+      console.log('[SMS] Catering inquiry notification sent for', inquiry.fullName);
     } else {
       const data = await res.text();
-      console.error('[SMS] Arkesel error for', order.ref, '— status:', res.status, data);
+      console.error('[SMS] Arkesel error (catering):', res.status, data);
     }
   } catch (err) {
-    console.error('[SMS] Failed to send notification:', err);
+    console.error('[SMS] Failed to send catering notification:', err);
+  }
+}
+
+// ─── Shared Arkesel sender ────────────────────────────────────────────────────
+
+async function arkeselSend(recipients: string[], message: string): Promise<boolean> {
+  const apiKey   = process.env.ARKESEL_API_KEY;
+  const senderId = process.env.ARKESEL_SENDER_ID ?? 'TastexxSee';
+
+  if (!apiKey) return false;
+
+  const res = await fetch('https://sms.arkesel.com/api/v2/sms/send', {
+    method: 'POST',
+    headers: { 'api-key': apiKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sender: senderId,
+      message,
+      recipients,
+      sandbox: process.env.NODE_ENV !== 'production',
+    }),
+  });
+
+  return res.status === 200;
+}
+
+// ─── Admin order notification SMS ─────────────────────────────────────────────
+
+/**
+ * Send new-order alert to the restaurant owner.
+ * Fire-and-forget — never throws so a failed SMS never blocks an order save.
+ *
+ * Required env vars:
+ *   ARKESEL_API_KEY   — from arkesel.com dashboard
+ *   ARKESEL_SENDER_ID — registered sender name, max 11 chars (e.g. "TastexxSee")
+ *   ADMIN_PHONE       — owner's number, Ghana format e.g. +233244123456
+ */
+export async function sendOrderSms(order: OrderSmsPayload): Promise<void> {
+  const adminPhone = process.env.ADMIN_PHONE;
+
+  if (!process.env.ARKESEL_API_KEY || !adminPhone) {
+    console.warn('[SMS] ARKESEL_API_KEY or ADMIN_PHONE not set — skipping admin SMS');
+    return;
+  }
+
+  const message = buildOrderSms(order);
+
+  try {
+    const ok = await arkeselSend([adminPhone], message);
+    if (ok) {
+      console.log('[SMS] Admin notification sent for', order.ref);
+    } else {
+      console.error('[SMS] Arkesel rejected admin SMS for', order.ref);
+    }
+  } catch (err) {
+    console.error('[SMS] Failed to send admin notification:', err);
+  }
+}
+
+// ─── Customer order confirmation SMS ──────────────────────────────────────────
+
+/**
+ * Build a concise customer-facing confirmation. Target: ≤160 chars (1 credit).
+ *
+ * Example output:
+ *   TastexxSee: Order confirmed! Ref: TXS-20250507-1234
+ *   Total: GHS 85.00 | Pay on Delivery
+ *   We'll call you within 10 mins.
+ */
+export function buildCustomerOrderSms(order: OrderSmsPayload): string {
+  const payLabel = order.orderType === 'delivery' ? 'Pay on Delivery' : 'Pay on Pickup';
+  return (
+    `TastexxSee: Order confirmed! Ref: ${order.ref}\n` +
+    `Total: ${formatGhs(order.total)} | ${payLabel}\n` +
+    `We'll call you within 10 mins.`
+  );
+}
+
+/**
+ * Send order confirmation SMS to the customer.
+ * Fire-and-forget — never throws.
+ */
+export async function sendCustomerOrderSms(order: OrderSmsPayload): Promise<void> {
+  if (!process.env.ARKESEL_API_KEY) {
+    console.warn('[SMS] ARKESEL_API_KEY not set — skipping customer confirmation SMS');
+    return;
+  }
+
+  const message = buildCustomerOrderSms(order);
+
+  try {
+    const ok = await arkeselSend([order.phone], message);
+    if (ok) {
+      console.log('[SMS] Customer confirmation sent to', order.phone, 'for', order.ref);
+    } else {
+      console.error('[SMS] Arkesel rejected customer SMS for', order.ref);
+    }
+  } catch (err) {
+    console.error('[SMS] Failed to send customer confirmation:', err);
   }
 }
