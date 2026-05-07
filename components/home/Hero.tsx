@@ -4,10 +4,46 @@ import { motion } from 'framer-motion';
 import { SectionMarker } from '@/components/ui/SectionMarker';
 import { Button } from '@/components/ui/Button';
 
-const WORDS = ['Local', 'roots.'];
-const WORDS2 = ['Global', 'plates.'];
+// Animates each character individually — gives the "oh wow" letter-by-letter entrance
+function AnimatedText({
+  text,
+  baseDelay,
+  className,
+}: {
+  text: string;
+  baseDelay: number;
+  className?: string;
+}) {
+  const chars = Array.from(text);
+  return (
+    <span className={className} aria-label={text}>
+      {chars.map((char, i) =>
+        char === ' ' ? (
+          <span key={i} className="inline-block" style={{ width: '0.28em' }} aria-hidden="true" />
+        ) : (
+          <motion.span
+            key={i}
+            className="inline-block"
+            aria-hidden="true"
+            initial={{ opacity: 0, y: 56 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.7,
+              delay: baseDelay + i * 0.035,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            {char}
+          </motion.span>
+        )
+      )}
+    </span>
+  );
+}
 
 export function Hero() {
+  // "Ghana's kitchen." = 16 chars → last letter animates in at 0.3 + 15*0.035 = 0.825s
+  // "Your table."     = 11 chars → starts at 0.72, completes at 0.72 + 10*0.035 = 1.07s
   return (
     <section
       className="relative flex flex-col justify-end min-h-screen overflow-hidden bg-ink"
@@ -44,41 +80,13 @@ export function Hero() {
 
       {/* Content — bottom */}
       <div className="relative z-10 px-6 md:px-12 lg:px-20 pb-20 md:pb-28 max-w-[1440px] mx-auto w-full">
-        {/* Headline */}
+        {/* Headline — letter-by-letter */}
         <h1 className="font-display text-cream leading-none mb-6" style={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}>
-          <span className="block">
-            {WORDS.map((word, i) => (
-              <motion.span
-                key={word}
-                className="inline-block mr-[0.25em]"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.8,
-                  delay: 0.4 + i * 0.12,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                {word}
-              </motion.span>
-            ))}
+          <span className="block overflow-hidden">
+            <AnimatedText text="Ghana's kitchen." baseDelay={0.3} />
           </span>
-          <span className="block italic text-gold">
-            {WORDS2.map((word, i) => (
-              <motion.span
-                key={word}
-                className="inline-block mr-[0.25em]"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.8,
-                  delay: 0.7 + i * 0.12,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                {word}
-              </motion.span>
-            ))}
+          <span className="block italic text-gold overflow-hidden">
+            <AnimatedText text="Your table." baseDelay={0.72} />
           </span>
         </h1>
 
@@ -87,7 +95,7 @@ export function Hero() {
           className="font-sans text-cream-200 text-lg md:text-xl mb-10 max-w-md"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1.1 }}
+          transition={{ duration: 0.8, delay: 1.2 }}
         >
           Ghanaian comfort food done with care, where local meets international.
         </motion.p>
@@ -97,7 +105,7 @@ export function Hero() {
           className="flex flex-wrap items-center gap-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1.4 }}
+          transition={{ duration: 0.8, delay: 1.6 }}
         >
           <Button variant="primary" href="/menu">
             Order Now

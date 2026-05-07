@@ -57,9 +57,14 @@ export function FounderTeaser() {
               className="font-display italic text-cream"
               style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', lineHeight: 1.3 }}
             >
-              <span className="text-gold mr-2" aria-hidden="true">—</span>
+              <span
+                className="text-gold font-display not-italic leading-none block -mb-2"
+                style={{ fontSize: 'clamp(3rem, 5vw, 4.5rem)' }}
+                aria-hidden="true"
+              >
+                &ldquo;
+              </span>
               Every plate that leaves my kitchen is one I&apos;d serve at my own table.
-              <span className="text-gold ml-2" aria-hidden="true">—</span>
             </motion.blockquote>
 
             <motion.div variants={fadeUp}>

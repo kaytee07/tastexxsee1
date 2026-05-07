@@ -42,9 +42,9 @@ export function TierSection() {
                   className="object-cover"
                   priority
                 />
-                {/* Gold frame accent */}
+                {/* Gold frame accent — hidden on mobile to avoid clipping */}
                 <div
-                  className="absolute -bottom-4 -right-4 w-full h-full border border-gold-700 opacity-30 pointer-events-none"
+                  className="absolute -bottom-4 -right-4 w-full h-full border border-gold-700 opacity-50 pointer-events-none hidden sm:block"
                   aria-hidden="true"
                 />
               </div>
@@ -186,9 +186,9 @@ export function TierSection() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                 />
-                {/* Gold frame accent */}
+                {/* Gold frame accent — hidden on mobile to avoid clipping */}
                 <div
-                  className="absolute -bottom-4 -left-4 w-full h-full border border-gold-700 opacity-30 pointer-events-none"
+                  className="absolute -bottom-4 -left-4 w-full h-full border border-gold-700 opacity-50 pointer-events-none hidden sm:block"
                   aria-hidden="true"
                 />
               </div>

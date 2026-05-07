@@ -27,7 +27,7 @@ export function CateringHighlight() {
   return (
     <section
       id="catering-highlight"
-      className="py-24 md:py-32 px-6 md:px-12 lg:px-20 bg-ink-800"
+      className="py-24 md:py-32 px-6 md:px-12 lg:px-20 bg-ink"
       aria-labelledby="catering-heading"
     >
       <div className="max-w-[1280px] mx-auto">

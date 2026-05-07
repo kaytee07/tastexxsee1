@@ -14,7 +14,7 @@ interface ButtonProps {
 }
 
 const baseStyles =
-  'inline-flex items-center justify-center gap-2 font-sans text-sm font-medium tracking-wide uppercase cursor-pointer transition-opacity duration-200 disabled:opacity-40 disabled:cursor-not-allowed';
+  'inline-flex items-center justify-center gap-2 font-sans text-sm font-medium tracking-widest uppercase cursor-pointer transition-opacity duration-200 disabled:opacity-40 disabled:cursor-not-allowed';
 
 const variantStyles = {
   primary:

@@ -2,16 +2,24 @@
 
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
-import { Divider } from '@/components/ui/Divider';
 import { fadeUp, stagger, viewportOnce } from '@/lib/motion';
 
 export function ClosingCta() {
   return (
     <section
-      className="py-24 md:py-32 px-6 md:px-12 lg:px-20 bg-ink-800"
+      className="grain-overlay relative overflow-hidden py-24 md:py-32 px-6 md:px-12 lg:px-20 bg-ink-800"
       aria-label="Call to action"
     >
-      <div className="max-w-[1280px] mx-auto">
+      {/* Decorative large quotation mark — visual anchor */}
+      <span
+        className="absolute right-8 top-8 font-display text-gold opacity-[0.04] pointer-events-none select-none"
+        style={{ fontSize: 'clamp(8rem, 20vw, 18rem)', lineHeight: 1 }}
+        aria-hidden="true"
+      >
+        &ldquo;
+      </span>
+
+      <div className="max-w-[1280px] mx-auto relative z-10">
         <motion.div
           variants={stagger}
           initial="initial"
@@ -19,9 +27,12 @@ export function ClosingCta() {
           viewport={viewportOnce}
           className="flex flex-col items-start gap-8"
         >
-          <motion.div variants={fadeUp}>
-            <Divider short />
-          </motion.div>
+          {/* Gold rule — visual punctuation */}
+          <motion.div
+            variants={fadeUp}
+            className="h-px w-16 bg-gold"
+            aria-hidden="true"
+          />
 
           <motion.h2
             variants={fadeUp}

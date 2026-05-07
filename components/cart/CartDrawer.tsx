@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,23 +13,28 @@ import type { ResolvedCartLine } from '@/types';
 
 function CartLineRow({ line }: { line: ResolvedCartLine }) {
   const cart = useCart();
-  const [imageError, setImageError] = [false, () => {}];
-  void imageError; // suppress unused warning — handled inline
+  const [imageError, setImageError] = useState(false);
 
   return (
     <li className="flex items-start gap-3 py-4 border-b border-gold-700/20">
       {/* Thumbnail */}
       <div className="relative w-12 h-12 flex-shrink-0 bg-ink-700 overflow-hidden">
-        <Image
-          src={line.image}
-          alt={line.name}
-          fill
-          sizes="48px"
-          className="object-cover"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
+        {!imageError ? (
+          <Image
+            src={line.image}
+            alt={line.name}
+            fill
+            sizes="48px"
+            className="object-cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="font-display italic text-gold text-base opacity-60">
+              {line.name.charAt(0)}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Name + controls */}

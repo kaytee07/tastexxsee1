@@ -59,11 +59,11 @@ export function Input({
           'font-sans text-sm text-cream placeholder:text-cream/30',
           'rounded-none outline-none',
           'focus:border-gold transition-colors duration-200',
-          error && 'border-gold-400'
+          error && 'border-gold'
         )}
       />
       {error && (
-        <p id={errorId} role="alert" className="font-sans text-xs text-gold-200 mt-0.5">
+        <p id={errorId} role="alert" className="font-sans text-xs text-gold mt-0.5">
           {error}
         </p>
       )}
