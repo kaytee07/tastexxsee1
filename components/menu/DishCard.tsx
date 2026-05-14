@@ -2,20 +2,11 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Eyebrow } from '@/components/ui/Eyebrow';
-import { PriceVariantPicker } from '@/components/menu/PriceVariantPicker';
+import { SizePickerModal } from '@/components/menu/SizePickerModal';
 import { formatPriceForCard } from '@/lib/format';
 import { useCart } from '@/lib/cart-context';
 import { cn } from '@/lib/utils';
-import type { MenuItem, VariantKey } from '@/types';
-
-const CATEGORY_LABELS: Record<string, string> = {
-  rice: 'Rice',
-  banku: 'Banku',
-  'yam-chips': 'Yam Chips',
-  noodles: 'Noodles',
-  extras: 'Extras',
-};
+import type { MenuItem } from '@/types';
 
 interface DishCardProps {
   item: MenuItem;
@@ -23,101 +14,88 @@ interface DishCardProps {
 
 export function DishCard({ item }: DishCardProps) {
   const cart = useCart();
-  const [selectedVariant, setSelectedVariant] = useState<VariantKey | null>(
-    null
-  );
-  const [imageError, setImageError] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [imgErr, setImgErr]       = useState(false);
 
   const isSingle = item.price.kind === 'single';
-  const canAdd = isSingle || selectedVariant !== null;
 
-  function handleAdd() {
-    if (!canAdd) return;
-    cart.add(item.id, selectedVariant ?? 'default');
+  function handleDirectAdd(e: React.MouseEvent) {
+    e.stopPropagation();
+    cart.add(item.id, 'default');
     cart.open();
   }
 
   return (
-    <article
-      className={cn(
-        'group relative flex flex-col bg-ink-800 transition-all duration-300',
-        'hover:shadow-[0_0_0_1px_var(--color-gold-700)] hover:shadow-gold-700'
-      )}
-      style={{
-        boxShadow: undefined,
-      }}
-    >
-      {/* Hover border via outline approach */}
-      <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 ring-1 ring-gold-700 z-10" />
-
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-ink-700">
-        {!imageError ? (
-          <Image
-            src={item.image}
-            alt={item.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-display italic text-gold-700 text-lg opacity-40">
-              {item.name.charAt(0)}
-            </span>
-          </div>
+    <>
+      <article
+        role={isSingle ? undefined : 'button'}
+        tabIndex={isSingle ? undefined : 0}
+        onClick={isSingle ? undefined : () => setModalOpen(true)}
+        onKeyDown={isSingle ? undefined : (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setModalOpen(true);
+          }
+        }}
+        className={cn(
+          'group relative flex flex-col bg-ink-800',
+          !isSingle && 'cursor-pointer'
         )}
-      </div>
+      >
+        {/* Hover gold ring */}
+        <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 ring-1 ring-gold-700 z-10" />
 
-      {/* Text content */}
-      <div className="flex flex-col flex-1 p-5 gap-3">
-        <div className="flex flex-col gap-1">
-          <Eyebrow>{CATEGORY_LABELS[item.category] ?? item.category}</Eyebrow>
-          <h3 className="font-display text-xl text-cream leading-snug">
-            {item.name}
-          </h3>
-          {item.description && (
-            <p className="font-sans text-sm text-cream-200 leading-relaxed line-clamp-2">
-              {item.description}
-            </p>
+        {/* Image — 4:3 ratio (more editorial, shows dish depth) */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-ink-700">
+          {!imgErr ? (
+            <Image
+              src={item.image}
+              alt={item.name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+              onError={() => setImgErr(true)}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="font-display italic text-gold-700 text-3xl opacity-30">
+                {item.name.charAt(0)}
+              </span>
+            </div>
           )}
         </div>
 
-        {/* Price summary */}
-        <p className="font-sans text-xs text-gold-400 tracking-wide">
-          {formatPriceForCard(item.price)}
-        </p>
+        {/* Card content */}
+        <div className="flex flex-col p-4 gap-2">
+          <h3 className="font-display italic text-cream text-lg leading-snug">
+            {item.name}
+          </h3>
+          <p className="font-sans text-xs text-gold-400 tracking-wide">
+            {formatPriceForCard(item.price)}
+          </p>
 
-        {/* Variant picker */}
-        {item.price.kind !== 'single' && (
-          <PriceVariantPicker
-            price={item.price}
-            selected={selectedVariant}
-            onChange={setSelectedVariant}
-          />
-        )}
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Add to order button */}
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={!canAdd}
-          className={cn(
-            'w-full h-10 font-sans text-xs font-medium tracking-widest uppercase transition-all duration-200 cursor-pointer',
-            'border disabled:opacity-40 disabled:cursor-not-allowed',
-            canAdd
-              ? 'bg-gold border-gold text-ink hover:opacity-90'
-              : 'bg-transparent border-gold-700 text-gold'
+          {/* CTA */}
+          {isSingle ? (
+            <button
+              type="button"
+              onClick={handleDirectAdd}
+              className="mt-2 w-full h-9 font-sans text-xs font-medium tracking-widest uppercase bg-gold border border-gold text-ink hover:opacity-90 transition-opacity duration-200 cursor-pointer"
+              style={{ borderRadius: 0 }}
+            >
+              Add to Order
+            </button>
+          ) : (
+            /* Subtle hint — whole card is the click target */
+            <p className="font-sans text-[10px] text-gold-700 tracking-[0.25em] uppercase mt-1 group-hover:text-gold transition-colors duration-200">
+              Select Size →
+            </p>
           )}
-          style={{ borderRadius: 0 }}
-        >
-          Add to Order
-        </button>
-      </div>
-    </article>
+        </div>
+      </article>
+
+      {modalOpen && (
+        <SizePickerModal item={item} onClose={() => setModalOpen(false)} />
+      )}
+    </>
   );
 }

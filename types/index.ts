@@ -33,7 +33,8 @@ export interface MenuItem {
   name: string;           // e.g. "Thai Fried Rice with Shrimps"
   description?: string;
   price: Price;
-  image: string;          // path under /public/images/menu
+  image: string;          // base/fallback shown before a size is selected
+  variantImages?: Partial<Record<VariantKey, string>>; // per-size photos — e.g. { regular: '/img/jollof_beef_regular.png', family: '/img/jollof_beef_family.png' }
   featured?: boolean;
   available?: boolean;
 }

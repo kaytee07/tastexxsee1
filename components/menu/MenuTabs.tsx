@@ -1,35 +1,47 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { menuItems } from '@/lib/menu-data';
 import { DishCard } from '@/components/menu/DishCard';
-import { SearchBar } from '@/components/menu/SearchBar';
 import type { CategoryId, SubGroupId, MenuItem } from '@/types';
 
 // ─── Tab config ───────────────────────────────────────────────────────────────
 
 const TABS: { id: CategoryId; label: string }[] = [
-  { id: 'rice', label: 'Rice' },
-  { id: 'banku', label: 'Banku' },
+  { id: 'rice',      label: 'Rice' },
+  { id: 'banku',     label: 'Banku' },
   { id: 'yam-chips', label: 'Yam Chips' },
-  { id: 'noodles', label: 'Noodles' },
-  { id: 'extras', label: 'Extras' },
+  { id: 'noodles',   label: 'Noodles' },
+  { id: 'extras',    label: 'Extras' },
 ];
 
 const RICE_SUBGROUPS: { id: SubGroupId; label: string }[] = [
-  { id: 'plain-rice', label: 'Plain Rice' },
-  { id: 'thai-fried-rice', label: 'Thai Fried Rice' },
+  { id: 'plain-rice',        label: 'Plain Rice' },
+  { id: 'thai-fried-rice',   label: 'Thai Fried Rice' },
   { id: 'spicy-jollof-rice', label: 'Spicy Jollof Rice' },
 ];
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Section header — editorial, full-width gold rule ─────────────────────────
+
+function SectionHeader({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-6 mb-6">
+      <h3 className="font-display italic text-gold text-2xl leading-none shrink-0">
+        {label}
+      </h3>
+      <div className="flex-1 h-px bg-gold-700/40" />
+    </div>
+  );
+}
+
+// ─── Dish grid ────────────────────────────────────────────────────────────────
 
 function DishGrid({ items }: { items: MenuItem[] }) {
   if (items.length === 0) {
     return (
-      <p className="font-sans text-sm text-cream-200/50 py-12 text-center col-span-full">
+      <p className="font-sans text-sm text-cream-200/40 py-10 text-center col-span-full">
         No dishes found.
       </p>
     );
@@ -43,24 +55,18 @@ function DishGrid({ items }: { items: MenuItem[] }) {
   );
 }
 
-function RiceTabContent({ search }: { search: string }) {
-  const lower = search.toLowerCase();
+// ─── Rice tab — three editorial sections ─────────────────────────────────────
 
+function RiceTabContent() {
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-14">
       {RICE_SUBGROUPS.map(({ id, label }) => {
         const items = menuItems.filter(
-          (item) =>
-            item.category === 'rice' &&
-            item.subGroup === id &&
-            (lower === '' || item.name.toLowerCase().includes(lower))
+          (item) => item.category === 'rice' && item.subGroup === id
         );
-        if (items.length === 0 && lower !== '') return null;
         return (
           <section key={id}>
-            <h3 className="font-display italic text-gold text-2xl mb-6 pb-2 border-b border-gold-700/40">
-              {label}
-            </h3>
+            <SectionHeader label={label} />
             <DishGrid items={items} />
           </section>
         );
@@ -69,24 +75,14 @@ function RiceTabContent({ search }: { search: string }) {
   );
 }
 
-function GenericTabContent({
-  category,
-  search,
-}: {
-  category: CategoryId;
-  search: string;
-}) {
-  const lower = search.toLowerCase();
-  const items = menuItems.filter(
-    (item) =>
-      item.category === category &&
-      (lower === '' || item.name.toLowerCase().includes(lower))
-  );
+// ─── Generic tab ─────────────────────────────────────────────────────────────
 
+function GenericTabContent({ category }: { category: CategoryId }) {
+  const items = menuItems.filter((item) => item.category === category);
   return <DishGrid items={items} />;
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 interface MenuTabsProps {
   initialTab?: string;
@@ -94,79 +90,65 @@ interface MenuTabsProps {
 
 export function MenuTabs({ initialTab = 'rice' }: MenuTabsProps) {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router       = useRouter();
 
   const paramTab = searchParams.get('tab') ?? initialTab;
   const validTab = TABS.find((t) => t.id === paramTab)?.id ?? 'rice';
 
   const [activeTab, setActiveTab] = useState<CategoryId>(validTab as CategoryId);
-  const [search, setSearch] = useState('');
 
   function handleTabChange(id: CategoryId) {
     setActiveTab(id);
-    setSearch('');
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', id);
     router.replace(`/menu?${params.toString()}`, { scroll: false });
   }
 
-  const contentKey = useMemo(() => activeTab, [activeTab]);
-
   return (
     <div className="flex flex-col gap-0">
-      {/* Tab bar + search */}
-      <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-8 border-b border-gold-700/40 pb-0">
-        {/* Tabs */}
-        <div className="flex items-end gap-0 overflow-x-auto scrollbar-none">
-          {TABS.map((tab) => {
-            const isActive = tab.id === activeTab;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => handleTabChange(tab.id)}
-                className={`
-                  relative px-4 py-3 font-sans text-sm font-medium tracking-wide uppercase
-                  transition-colors duration-200 whitespace-nowrap cursor-pointer
-                  ${isActive ? 'text-gold' : 'text-cream-200/60 hover:text-cream-200'}
-                `}
-                style={{ borderRadius: 0 }}
-              >
-                {tab.label}
-                {isActive && (
-                  <motion.div
-                    layoutId="tab-indicator"
-                    className="absolute bottom-0 left-0 right-0 h-px bg-gold"
-                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Search bar */}
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          className="sm:ml-auto sm:w-52 pb-3"
-        />
+      {/* Tab bar */}
+      <div className="flex items-end overflow-x-auto scrollbar-none border-b border-gold-700/40">
+        {TABS.map((tab) => {
+          const isActive = tab.id === activeTab;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => handleTabChange(tab.id)}
+              className={`
+                relative px-5 py-3 font-sans text-sm font-medium tracking-wide uppercase
+                transition-colors duration-200 whitespace-nowrap cursor-pointer
+                ${isActive ? 'text-gold' : 'text-cream-200/50 hover:text-cream-200'}
+              `}
+              style={{ borderRadius: 0 }}
+            >
+              {tab.label}
+              {isActive && (
+                <motion.div
+                  layoutId="tab-indicator"
+                  className="absolute bottom-0 left-0 right-0 h-px bg-gold"
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Tab content with cross-fade */}
-      <div className="pt-8">
+      {/* Tab content */}
+      <div className="pt-10">
         <AnimatePresence mode="wait">
           <motion.div
-            key={contentKey}
+            key={activeTab}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
           >
             {activeTab === 'rice' ? (
-              <RiceTabContent search={search} />
+              <RiceTabContent />
             ) : (
-              <GenericTabContent category={activeTab} search={search} />
+              <GenericTabContent category={activeTab} />
             )}
           </motion.div>
         </AnimatePresence>
