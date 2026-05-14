@@ -13,10 +13,22 @@ export default async function DashboardPage() {
   let inquiries: CateringInquiry[] = [];
 
   try {
-    const [rawOrders, rawInquiries] = await Promise.all([
-      prisma.order.findMany({ orderBy: { createdAt: 'desc' } }),
+    const [activeOrders, completedOrders, rawInquiries] = await Promise.all([
+      // Always fetch ALL active orders — never miss an in-progress order
+      prisma.order.findMany({
+        where: { status: { in: ['received', 'preparing', 'ready'] } },
+        orderBy: { createdAt: 'desc' },
+      }),
+      // Completed orders: cap at 100 most recent — history, not action
+      prisma.order.findMany({
+        where: { status: 'completed' },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      }),
       prisma.cateringInquiry.findMany({ orderBy: { createdAt: 'desc' } }),
     ]);
+
+    const rawOrders = [...activeOrders, ...completedOrders];
 
     orders = rawOrders.map((o: typeof rawOrders[number]) => ({
       id: o.id,

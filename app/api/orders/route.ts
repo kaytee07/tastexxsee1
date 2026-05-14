@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db';
 import { generateRef } from '@/lib/format';
 import { sendOrderSms, sendCustomerOrderSms } from '@/lib/sms';
 import { auth } from '@/lib/auth';
+import { menuItems } from '@/lib/menu-data';
+import { getVariantPrice } from '@/lib/menu-helpers';
 import type { ResolvedCartLine, OrderType, PaymentMethod, MomoProvider } from '@/types';
 
 // POST /api/orders — create a new order
@@ -33,6 +35,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Address required for delivery' }, { status: 400 });
     }
 
+    // ── Server-side price verification ────────────────────────────────────────
+    // Never trust the client-sent total or unit prices.
+    // Recalculate every line from the authoritative menu data.
+    let serverTotal = 0;
+    const verifiedLines: ResolvedCartLine[] = [];
+
+    for (const line of lines) {
+      const item = menuItems.find((m) => m.id === line.itemId);
+      if (!item) {
+        return NextResponse.json(
+          { error: `Unknown menu item: ${line.itemId}` },
+          { status: 400 }
+        );
+      }
+      const unitPrice = getVariantPrice(item, line.variantKey);
+      const lineTotal = unitPrice * line.qty;
+      serverTotal   += lineTotal;
+      verifiedLines.push({ ...line, unitPrice, lineTotal });
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const ref = generateRef();
 
     const order = await prisma.order.create({
@@ -46,8 +69,8 @@ export async function POST(req: NextRequest) {
         momoProvider: momoProvider ?? null,
         momoNumber: momoNumber ?? null,
         notes: notes ?? null,
-        lines: lines as object[],
-        total,
+        lines: verifiedLines as object[],  // server-verified lines
+        total: serverTotal,                // server-calculated total
       },
     });
 
@@ -59,7 +82,7 @@ export async function POST(req: NextRequest) {
       orderType: order.orderType as OrderType,
       address: order.address ?? undefined,
       paymentMethod: 'cash' as const,
-      lines,
+      lines: verifiedLines,
       total: order.total,
       notes: order.notes ?? undefined,
     };
@@ -84,6 +107,7 @@ export async function GET() {
   try {
     const orders = await prisma.order.findMany({
       orderBy: { createdAt: 'desc' },
+      take: 200,
     });
     return NextResponse.json(orders);
   } catch (err) {

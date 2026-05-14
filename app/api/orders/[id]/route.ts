@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { auth } from '@/lib/auth';
-import type { OrderStatus } from '@/types';
+import { sendOrderCompletedSms } from '@/lib/sms';
+import type { OrderStatus, OrderType } from '@/types';
 
 const VALID_STATUSES: OrderStatus[] = ['received', 'preparing', 'ready', 'completed'];
 
@@ -28,6 +29,16 @@ export async function PATCH(
       where: { id },
       data: { status },
     });
+
+    // Fire completion SMS to customer — non-blocking, never fails the response
+    if (status === 'completed') {
+      sendOrderCompletedSms({
+        ref:          order.ref,
+        phone:        order.phone,
+        customerName: order.customerName,
+        orderType:    order.orderType as OrderType,
+      });
+    }
 
     return NextResponse.json(order);
   } catch (err) {

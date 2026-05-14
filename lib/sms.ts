@@ -168,19 +168,23 @@ export async function sendOrderSms(order: OrderSmsPayload): Promise<void> {
 // ─── Customer order confirmation SMS ──────────────────────────────────────────
 
 /**
- * Build a concise customer-facing confirmation. Target: ≤160 chars (1 credit).
+ * Build a customer-facing order confirmation.
+ * Includes order ref, items summary, total, and payment method.
+ * Kept tight — aim for ≤160 chars (1 SMS credit). Items are truncated if needed.
  *
  * Example output:
  *   TastexxSee: Order confirmed! Ref: TXS-20250507-1234
+ *   Jollof Rice x1, Fried Chicken x1
  *   Total: GHS 85.00 | Pay on Delivery
- *   We'll call you within 10 mins.
  */
 export function buildCustomerOrderSms(order: OrderSmsPayload): string {
-  const payLabel = order.orderType === 'delivery' ? 'Pay on Delivery' : 'Pay on Pickup';
+  const payLabel    = order.orderType === 'delivery' ? 'Pay on Delivery' : 'Pay on Pickup';
+  const itemsSummary = order.lines.map((l) => `${l.name} x${l.qty}`).join(', ');
+
   return (
     `TastexxSee: Order confirmed! Ref: ${order.ref}\n` +
-    `Total: ${formatGhs(order.total)} | ${payLabel}\n` +
-    `We'll call you within 10 mins.`
+    `${itemsSummary}\n` +
+    `Total: ${formatGhs(order.total)} | ${payLabel}`
   );
 }
 
@@ -205,5 +209,55 @@ export async function sendCustomerOrderSms(order: OrderSmsPayload): Promise<void
     }
   } catch (err) {
     console.error('[SMS] Failed to send customer confirmation:', err);
+  }
+}
+
+// ─── Customer order completion SMS ────────────────────────────────────────────
+
+interface OrderCompletedPayload {
+  ref: string;
+  phone: string;
+  customerName: string;
+  orderType: OrderType;
+}
+
+/**
+ * Build the completion SMS sent when admin marks an order as Completed.
+ * Delivery → "has been delivered". Pickup → "is ready for collection".
+ * Target: ≤160 chars (1 credit).
+ */
+export function buildOrderCompletedSms(order: OrderCompletedPayload): string {
+  const action =
+    order.orderType === 'delivery'
+      ? 'has been delivered'
+      : 'is ready for collection';
+  return (
+    `TastexxSee: Hi ${order.customerName}, your order ${order.ref} ${action}.\n` +
+    `Thank you for dining with us!`
+  );
+}
+
+/**
+ * Send order-completed SMS to the customer.
+ * Called by PATCH /api/orders/[id] when status advances to "completed".
+ * Fire-and-forget — never throws.
+ */
+export async function sendOrderCompletedSms(order: OrderCompletedPayload): Promise<void> {
+  if (!process.env.ARKESEL_API_KEY) {
+    console.warn('[SMS] ARKESEL_API_KEY not set — skipping completion SMS');
+    return;
+  }
+
+  const message = buildOrderCompletedSms(order);
+
+  try {
+    const ok = await arkeselSend([order.phone], message);
+    if (ok) {
+      console.log('[SMS] Completion SMS sent to', order.phone, 'for', order.ref);
+    } else {
+      console.error('[SMS] Arkesel rejected completion SMS for', order.ref);
+    }
+  } catch (err) {
+    console.error('[SMS] Failed to send completion SMS:', err);
   }
 }
