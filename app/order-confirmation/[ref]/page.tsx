@@ -35,7 +35,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
           {ref}
         </h1>
         <p className="font-sans text-cream-200 max-w-md">
-          We&apos;ve received your order. The restaurant will call you within 10 minutes to confirm.
+          We&apos;ve received your order. A confirmation has been sent to your phone.
           Estimated delivery: 30–45 minutes.
         </p>
         <a href="/menu" className="font-sans text-sm text-gold hover:underline">
@@ -60,7 +60,7 @@ export default async function OrderConfirmationPage({ params }: Props) {
         </h1>
 
         <p className="font-sans text-cream-200 mb-10">
-          We&apos;ve received your order. The restaurant will call you within 10 minutes to confirm.
+          We&apos;ve received your order. A confirmation has been sent to your phone.
           Estimated delivery: 30–45 minutes.
         </p>
 

@@ -95,7 +95,6 @@ export async function sendCateringSms(inquiry: CateringSmsPayload): Promise<void
         sender: senderId,
         message,
         recipients: [adminPhone],
-        sandbox: process.env.NODE_ENV !== 'production',
       }),
     });
 
@@ -125,7 +124,6 @@ async function arkeselSend(recipients: string[], message: string): Promise<boole
       sender: senderId,
       message,
       recipients,
-      sandbox: process.env.NODE_ENV !== 'production',
     }),
   });
 
