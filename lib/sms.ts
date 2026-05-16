@@ -127,6 +127,11 @@ async function arkeselSend(recipients: string[], message: string): Promise<boole
     }),
   });
 
+  if (res.status !== 200) {
+    const body = await res.text();
+    console.error('[SMS] Arkesel error — status:', res.status, '| body:', body);
+  }
+
   return res.status === 200;
 }
 
